@@ -1,0 +1,4 @@
+{
+  "main": "DropDown.js",
+  "requires": ["FocusLock"]
+}

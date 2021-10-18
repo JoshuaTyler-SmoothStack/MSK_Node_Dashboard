@@ -1,0 +1,26 @@
+{
+  "commands": {
+    "bold": "bold",
+    "header1": "header-four",
+    "header2": "header-five",
+    "italic": "italic",
+    "link": {
+      "confirm": "link_confirm",
+      "prompt": "link_prompt"
+    },
+    "underline": "underline"
+  },
+  "decorators": {
+    "link": {
+      "class": "",
+      "component": "LINK",
+      "strategy": "findLinkEntities",
+      "style": {
+        "color": "#3b5998",
+        "cursor": "pointer",
+        "textDecoration": "underline"
+      }
+    }
+  },
+  "inlineStyles": [ "BOLD", "ITALIC", "UNDERLINE" ]
+}

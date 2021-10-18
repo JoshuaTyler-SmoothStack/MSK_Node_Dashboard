@@ -1,0 +1,4 @@
+{
+  "main": "InputText.js",
+  "requires": ["DropDown"]
+}
