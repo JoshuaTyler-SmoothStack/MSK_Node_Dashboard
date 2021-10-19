@@ -66,7 +66,7 @@ class ImageFrame extends Component {
         {/* Image */}
         {imageUrl && (
           <img
-            alt={""}
+            aria-label={this.props.alt || ""}
             className={(this.props.imageClassName || "rounded kit-border-shadow")}
             ref={this.imageRef}
             src={imageUrl}

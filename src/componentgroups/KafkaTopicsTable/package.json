@@ -1,0 +1,4 @@
+{
+  "main": "KafkaTopicsTable.js",
+  "requires": ["SVG", "SVG_Caret_Right", "SVG_Harddrive"]
+}

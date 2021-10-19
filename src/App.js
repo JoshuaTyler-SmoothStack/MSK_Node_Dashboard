@@ -37,7 +37,7 @@ class App extends Component {
   render() {
     return (
       <div id={"content"}>
-        <header role={"header"}>
+        <header role={"navigation"}>
           <Navbar style={{ height: "60px" }}/>
         </header>
         <main role={"main"}>

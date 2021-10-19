@@ -5,7 +5,7 @@ const ConnectionIndicator = (props) => {
   // @props: isLoading - Boolean
   // @props: status - String (danger, success, warn)
 
-  const indicatorSize = props.indicatorSize || "30px";
+  const indicatorSize = props.indicatorSize || "25px";
   const isLoading = props.isLoading || false;
   const status = props.status || "success";
 

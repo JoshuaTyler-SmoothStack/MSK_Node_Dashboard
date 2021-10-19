@@ -1,4 +1,4 @@
 {
   "main": "Navbar.js",
-  "requires": ["ConnectionIndicator", "InputText"]
+  "requires": ["ConnectionMonitor"]
 }

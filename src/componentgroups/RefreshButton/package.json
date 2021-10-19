@@ -1,0 +1,4 @@
+{
+  "main": "RefreshButton.js",
+  "requires": ["SVG", "SVG_ARROW_CLOCKWISE"]
+}

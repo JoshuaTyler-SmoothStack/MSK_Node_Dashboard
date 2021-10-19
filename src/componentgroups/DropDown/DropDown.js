@@ -87,7 +87,7 @@ const DropDown = (props) => {
           <li key={"option-" + i}>
             {typeof(option) === "string"
               ? <button
-                  alt={option + (props.optionsName || "")}
+                  aria-label={option + (props.optionsName || "")}
                   className={(selection === option ? (selectionClassName || "active") : (optionsClassName || "dropdown-item"))}
                   type={"button"}
                   onClick={(e) => {
@@ -107,7 +107,7 @@ const DropDown = (props) => {
       optionsRender =
       <li>
         <button
-          alt={options + (props.optionsName || "")}
+          aria-label={options + (props.optionsName || "")}
           className={(selection === options ? (selectionClassName || "active") : (optionsClassName || "dropdown-item"))}
           type={"button"}
           onClick={(e) => {
@@ -132,7 +132,7 @@ const DropDown = (props) => {
       style={props.style}
     >
       <button
-        alt={(props.alt || "")}
+        aria-label={(props.alt || "")}
         className={String(`btn ${(props.buttonClassName || "")}`)}
         style={ props.buttonStyle || { textAlign: "left"}}
         type={"button"}

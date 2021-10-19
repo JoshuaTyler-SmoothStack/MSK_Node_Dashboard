@@ -34,7 +34,7 @@ const SVG = (props) => {
       height={height}
       stroke={stroke}
       strokeWidth={strokeWidth}
-      style={{ ...props.style, background }}
+      style={{ ...props.style, background, overflow: "visible" }}
       viewBox={viewBox}
       width={width}
       xmlns={xmlns}

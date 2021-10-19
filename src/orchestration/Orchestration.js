@@ -21,7 +21,7 @@ class Orchestration {
       body,
       method: requestType,
     })
-    .then((response) => response.clone().json().catch(() => response.text()))
+    .then((response) => response.clone().json())
     .then((data) => httpResponseBody(data))
     .catch((err) => httpError(err));
   }
