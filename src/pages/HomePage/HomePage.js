@@ -46,7 +46,10 @@ class HomePage extends Component {
           {/* Kafka Cluster Connection Interface */}
           <div className={"row"}>
             {/* MSK ConnectionMonitor */}
-            <ConnectionMonitor onConnection={(connectionUrl) => this.setState({ connectionUrl })}/>
+            <ConnectionMonitor
+              searchSuggestions={[ "http://ec2-52-61-206-217.us-gov-west-1.compute.amazonaws.com:8080" ]}
+              onConnection={(connectionUrl) => this.setState({ connectionUrl })}
+            />
           </div>
 
           {/* Kafka Topic Interface */}
@@ -132,7 +135,11 @@ class HomePage extends Component {
 
   handleGetTopics = () => {
     const { connectionUrl } = this.state;
-    this.setState({ topicsAreLoading: true });
+    this.setState({
+      selectedTopic: "",
+      topicsAreLoading: true
+    });
+
     Orchestration.createRequest(
       "GET",
       `${connectionUrl}/describe/topics`,
@@ -159,7 +166,7 @@ class HomePage extends Component {
     });
     Orchestration.createRequest(
       "GET",
-      `${connectionUrl}/topics/${topicName}`,
+      `${connectionUrl}/consume/${topicName}`,
       (httpError) => {
         this.setState({
           error: httpError,

@@ -23,6 +23,8 @@ const TABLE_TD_STYLE = {
 };
 
 const ConnectionMonitor = (props) => {
+  const searchSuggestions = props.searchSuggestions || [];
+
   const [connectionInformation, setConnectionInformation] = useState({});
   const [connectionIsLoading, setConnectionIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState("danger");
@@ -160,9 +162,7 @@ const ConnectionMonitor = (props) => {
       {/* Connection Input */}
       <InputText
         placeholder={"Connection Address"}
-        searchSuggestions={[
-          "http://ec2-3-86-207-38.compute-1.amazonaws.com:8080",
-        ]}
+        searchSuggestions={searchSuggestions}
         onChange={(value) => setConnectionUrl(value)}
       />
       <button
