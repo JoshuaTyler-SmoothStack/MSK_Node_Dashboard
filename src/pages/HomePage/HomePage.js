@@ -179,9 +179,11 @@ class HomePage extends Component {
       (/* httpResponse */) => {
         const topicWebSocket = new WebSocketClient(
           "ws://ec2-160-1-83-9.us-gov-west-1.compute.amazonaws.com:8081",
-          topicMessage => this.state.selectedTopicOutput.push(topicMessage),
+          topicMessage => {
+            console.log("received: ", topicMessage);
+            this.state.selectedTopicOutput.push(topicMessage);
+          }
         );
-        topicWebSocket.initialize();
         this.setState({
           selectedTopicIsLoading: false,
           topicWebSocket,

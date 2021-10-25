@@ -45,11 +45,18 @@ export class WebSocketServer {
 
     // Client Disconnect
     webSocketServer.on("close", (clientConnection) => {
+      let noClients = true;
       const clients = this.clients;
       for(const clientKeys in clients) {
         if(clients[clientKeys].connection.remoteAddress === clientConnection.remoteAddress) {
           clients[clientKeys].isConnected = false;
         }
+        else {
+          noClients = false;
+        }
+      }
+      if(noClients) {
+        webSocketServer.shutDown();
       }
     });
   }
@@ -58,12 +65,19 @@ export class WebSocketServer {
     const webSocketServer = this.webSocketServer;
     webSocketServer.broadcast(JSON.stringify(message));
   }
+
+  shutdown() {
+    const webSocketServer = this.webSocketServer;
+    webSocketServer.closeAllConnections();
+    webSocketServer.shutDown();
+  }
 }
 
 export class WebSocketClient {
   constructor(connectionUrl, onWebSocketServerMessage) {
     this.webSocketClient = this.bindWebSocketClient(connectionUrl);
     this.onWebSocketServerMessage = onWebSocketServerMessage;
+    this.initialize();
   }
 
   bindWebSocketClient(connectionUrl) {
