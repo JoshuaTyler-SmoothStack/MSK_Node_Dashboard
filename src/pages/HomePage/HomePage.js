@@ -47,7 +47,7 @@ class HomePage extends Component {
           <div className={"row"}>
             {/* MSK ConnectionMonitor */}
             <ConnectionMonitor
-              searchSuggestions={[ "http://ec2-52-61-206-217.us-gov-west-1.compute.amazonaws.com:8080" ]}
+              searchSuggestions={[ "http://ec2-160-1-83-9.us-gov-west-1.compute.amazonaws.com:8080" ]}
               onConnection={(connectionUrl) => this.setState({ connectionUrl })}
             />
           </div>
@@ -164,9 +164,10 @@ class HomePage extends Component {
       selectedTopic: topicName,
       selectedTopicIsLoading: true,
     });
-    Orchestration.createRequest(
-      "GET",
-      `${connectionUrl}/consume/${topicName}`,
+    Orchestration.createRequestWithBody(
+      ("POST"),
+      (`${connectionUrl}/consume`),
+      ({ topicName, fromBeginning: true }),
       (httpError) => {
         this.setState({
           error: httpError,

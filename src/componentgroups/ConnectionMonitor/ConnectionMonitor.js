@@ -13,7 +13,6 @@ import SVG_Caret_Down from "../../svgs/SVG_Caret_Down";
 import SVG_Caret_Up from "../../svgs/SVG_Caret_Up";
 
 // Constants (Local)
-const DEFAULT_CONNECTION_PING = 5000;
 const TABLE_TD_ERROR_CLASSNAME = "bg-danger";
 const TABLE_TD_STYLE = {
   maxWidth: "200px",
@@ -52,7 +51,6 @@ const ConnectionMonitor = (props) => {
         } else {
           setConnectionStatus("warning");
         }
-        setTimeout(() => pingMskConnection(), DEFAULT_CONNECTION_PING);
       }
     );
   };

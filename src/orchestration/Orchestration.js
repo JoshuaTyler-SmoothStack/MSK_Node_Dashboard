@@ -3,8 +3,8 @@ class Orchestration {
 
     // Content Negotiation
     const contentNegotiation = {
-      "Accept": "application/" + Orchestration.contentType,
-      "Content-Type": "application/" + Orchestration.contentType,
+      "Accept": "application/json",
+      "Content-Type": "application/json",
     };
 
     // Headers
