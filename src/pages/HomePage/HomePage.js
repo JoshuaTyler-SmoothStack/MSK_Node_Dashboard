@@ -1,6 +1,7 @@
 // Libraries
 import Orchestration from "../../orchestration/Orchestration";
 import React, { Component } from "react";
+import { WebSocketClient } from "../../orchestration/WebSocket";
 
 // Components
 import ConnectionMonitor from "../../componentgroups/ConnectionMonitor";
@@ -24,6 +25,7 @@ class HomePage extends Component {
       selectedTopicOutput: [],
       topics: [],
       topicsAreLoading: false,
+      topicWebSocket: null,
     };
   }
 
@@ -174,10 +176,15 @@ class HomePage extends Component {
           selectedTopicIsLoading: false,
         });
       },
-      (httpResponse) => {
+      (/* httpResponse */) => {
+        const topicWebSocket = new WebSocketClient(
+          "ws://ec2-160-1-83-9.us-gov-west-1.compute.amazonaws.com:8081",
+          topicMessage => this.state.selectedTopicOutput.push(topicMessage),
+        );
+        topicWebSocket.initialize();
         this.setState({
           selectedTopicIsLoading: false,
-          selectedTopicOutput: httpResponse,
+          topicWebSocket,
         });
       }
     );
