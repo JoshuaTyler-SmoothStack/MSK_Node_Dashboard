@@ -27,7 +27,7 @@ const KafkaTopicInputOutput = (props) => {
 
       {/* Output */}
       <div
-        className={"bg-light d-flex flex-column align-items-start p-1 kit-border-shadow-sm"}
+        className={"bg-light d-flex flex-column align-items-start p-1 text-left text-nowrap kit-border-shadow-sm"}
         style={{ height: "200px", overflow: "auto" }}
       >
         {isLoading

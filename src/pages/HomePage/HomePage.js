@@ -39,6 +39,8 @@ class HomePage extends Component {
       topicsAreLoading,
     } = this.state;
 
+    console.log(selectedTopicOutput);
+
     return (
       <div className={this.props.className || ""} style={this.props.style}>
         {/* Icon gallery of technologies */}
@@ -49,7 +51,7 @@ class HomePage extends Component {
           <div className={"row"}>
             {/* MSK ConnectionMonitor */}
             <ConnectionMonitor
-              searchSuggestions={[ "http://ec2-160-1-83-9.us-gov-west-1.compute.amazonaws.com:8080" ]}
+              searchSuggestions={[ "http://ec2-52-222-1-129.us-gov-west-1.compute.amazonaws.com:8080" ]}
               onConnection={(connectionUrl) => this.setState({ connectionUrl })}
             />
           </div>
@@ -135,6 +137,13 @@ class HomePage extends Component {
     );
   }
 
+  componentWillUnmount() {
+    const { topicWebSocket } = this.state;
+    if(topicWebSocket) {
+      topicWebSocket.shutown();
+    }
+  }
+
   handleGetTopics = () => {
     const { connectionUrl } = this.state;
     this.setState({
@@ -161,32 +170,42 @@ class HomePage extends Component {
   };
 
   handleSelectTopic = (topicName) => {
-    const { connectionUrl } = this.state;
+    const { connectionUrl, topicWebSocket } = this.state;
     this.setState({
       selectedTopic: topicName,
       selectedTopicIsLoading: true,
     });
+
+    // close any exisiting websocket connection
+    if(topicWebSocket) {
+      topicWebSocket.shutdown();
+    }
+
+    // request the new websocket connection
     Orchestration.createRequestWithBody(
       ("POST"),
       (`${connectionUrl}/consume`),
       ({ topicName, fromBeginning: true }),
       (httpError) => {
+        console.log("Received error:", httpError);
         this.setState({
           error: httpError,
           selectedTopicIsLoading: false,
+          topicWebSocket: null,
         });
       },
       (/* httpResponse */) => {
-        const topicWebSocket = new WebSocketClient(
-          "ws://ec2-160-1-83-9.us-gov-west-1.compute.amazonaws.com:8081",
-          topicMessage => {
+        console.log("Received response, creating websocket client.");
+        const newTopicWebSocket = new WebSocketClient(
+          "ws://ec2-52-222-1-129.us-gov-west-1.compute.amazonaws.com:8081",
+          (topicMessage) => {
             console.log("received: ", topicMessage);
-            this.state.selectedTopicOutput.push(topicMessage);
+            this.setState((state) => ({ selectedTopicOutput: [ ...state.selectedTopicOutput, topicMessage ]}));
           }
         );
         this.setState({
           selectedTopicIsLoading: false,
-          topicWebSocket,
+          topicWebSocket: newTopicWebSocket,
         });
       }
     );

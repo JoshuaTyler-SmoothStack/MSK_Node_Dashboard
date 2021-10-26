@@ -102,4 +102,9 @@ export class WebSocketClient {
     const client = this.webSocketClient;
     client.send(JSON.stringify(message));
   }
+
+  shutdown() {
+    const webSocketClient = this.webSocketClient;
+    webSocketClient.close();
+  }
 }
