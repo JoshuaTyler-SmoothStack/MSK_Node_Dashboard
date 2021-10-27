@@ -59,7 +59,7 @@ const ConnectionMonitor = (props) => {
     <div className={"bg-light d-flex align-items-center rounded m-1 p-1 w-100 kit-border-shadow"}>
       {/* Label */}
       <div
-        className={"bg-info p-1 rounded text-light kit-border-shadow-sm"}
+        className={"bg-info p-1 rounded text-light"}
       >
         {"MSK Node"}
       </div>
