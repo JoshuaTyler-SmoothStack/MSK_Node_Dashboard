@@ -11,7 +11,7 @@ class Orchestration {
     const headers = { ...contentNegotiation, ...requestHeaders };
 
     // Body
-    const body = (requestType !== "GET" && requestType !== "DELETE")
+    const body = (requestType !== "GET")
       ? JSON.stringify(requestBody)
       : null;
 
@@ -21,8 +21,18 @@ class Orchestration {
       body,
       method: requestType,
     })
-    .then((response) => response.clone().json().catch(() => response.text()))
-    .then((data) => httpResponseBody(data))
+    .then((response) => {
+      if(response.ok) {
+        response.clone().json()
+        .catch(() => response.text())
+        .then((data) => httpResponseBody(data));
+      }
+      else {
+        response.clone().json()
+        .catch(() => response.text())
+        .then((data) => httpError(data));
+      }
+    })
     .catch((err) => httpError(err));
   }
 
