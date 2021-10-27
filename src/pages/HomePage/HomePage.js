@@ -1,4 +1,5 @@
 // Libraries
+import Config from "../../resources/Config.json";
 import Orchestration from "../../orchestration/Orchestration";
 import React, { Component } from "react";
 import { WebSocketClient } from "../../orchestration/WebSocket";
@@ -19,10 +20,15 @@ class HomePage extends Component {
     super(props);
     this.state = {
       connectionUrl: "",
+      createTopicName: "",
+      deleteTopicName: "",
       error: "",
+      inputIsLoading: false,
       selectedTopic: "",
       selectedTopicIsLoading: false,
       selectedTopicOutput: [],
+      topicCreateIsActive: false,
+      topicDeleteIsActive: false,
       topics: [],
       topicsAreLoading: false,
       topicWebSocket: null,
@@ -31,28 +37,38 @@ class HomePage extends Component {
 
   render() {
     const {
+      createTopicName,
+      deleteTopicName,
       error,
+      inputIsLoading,
       selectedTopic,
       selectedTopicIsLoading,
       selectedTopicOutput,
+      topicCreateIsActive,
+      topicDeleteIsActive,
       topics,
       topicsAreLoading,
     } = this.state;
 
-    console.log(selectedTopicOutput);
+    const createTopicDisabled = (topics.length < 1 || topicsAreLoading);
 
     return (
       <div className={this.props.className || ""} style={this.props.style}>
+
         {/* Icon gallery of technologies */}
         <section
           className={"jumbotron text-center mt-2 px-4 py-2 kit-border-shadow"}
         >
           {/* Kafka Cluster Connection Interface */}
           <div className={"row"}>
+
             {/* MSK ConnectionMonitor */}
             <ConnectionMonitor
-              searchSuggestions={[ "http://ec2-52-222-1-129.us-gov-west-1.compute.amazonaws.com:8080" ]}
-              onConnection={(connectionUrl) => this.setState({ connectionUrl })}
+              searchSuggestions={[ `http://${Config.kafkaEC2Address}:8080` ]}
+              onConnection={(connectionUrl) => {
+                this.setState({ connectionUrl });
+                this.handleGetTopics();
+              }}
             />
           </div>
 
@@ -65,8 +81,18 @@ class HomePage extends Component {
               {/* Header */}
               <div className={"bg-white card-header d-flex align-items-center"}>
                 <div className={"card-title h3"}>{"Topics"}</div>
+                <button
+                  className={`btn btn-success btn-sm ml-auto ${ createTopicDisabled ? "disabled" : ""}`}
+                  onClick={() => {
+                    if(!createTopicDisabled) {
+                      this.setState({ topicCreateIsActive: true });
+                    }
+                  }}
+                >
+                  {"+ Create Topic"}
+                </button>
                 <RefreshButton
-                  className={"btn btn-light ml-auto kit-border-shadow-sm"}
+                  className={"btn btn-light ml-3 kit-border-shadow-sm"}
                   isLoading={topicsAreLoading}
                   size={"1.5rem"}
                   onClick={() => this.handleGetTopics()}
@@ -74,10 +100,11 @@ class HomePage extends Component {
               </div>
 
               {/* Topics Table */}
-              <div className={"card-body p-1"}>
+              <div className={"card-body d-flex align-items-center justify-content-center p-1"}>
                 <KafkaTopicsTable
                   topics={topics}
                   topicSelected={selectedTopic}
+                  onDeleteTopic={(topicName) => this.setState({ deleteTopicName: topicName, topicDeleteIsActive: true })}
                   onSelectTopic={(topicName) => this.handleSelectTopic(topicName)}
                 />
               </div>
@@ -108,9 +135,11 @@ class HomePage extends Component {
                   }
                 </div>
                 <KafkaTopicInputOutput
+                  disabled={!selectedTopic || inputIsLoading}
+                  displayMessage={selectedTopic ? "Awaiting topic data . . ." : ""}
                   isLoading={selectedTopicIsLoading}
                   output={selectedTopicOutput}
-                  onInput={(input) => selectedTopicOutput.push(input)}
+                  onInput={(input) => this.handlePublishToTopic(selectedTopic, input)}
                 />
               </div>
             </div>
@@ -119,6 +148,72 @@ class HomePage extends Component {
 
         {/* Consumers */}
         {/* Producers */}
+
+        {/* Topic Create Modal */}
+        {topicCreateIsActive && (
+          <Modal onClose={() => this.setState({ topicCreateIsActive: false })}>
+            <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
+              <div
+                className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
+                style={{ height: "200px", width: "200px"}}
+              >
+                <h5 className={"text-dark text-center"}>{"Topic Name:"}</h5>
+                <input
+                  className={"form-control"}
+                  onChange={(e) => this.setState({ createTopicName: e.target.value })}
+                />
+                <div className={"d-flex justify-content-around mt-3 w-100"}>
+                  <button
+                    className={"btn btn-secondary"}
+                    onClick={() => this.setState({ topicCreateIsActive: false })}
+                  >
+                    {"Cancel"}
+                  </button>
+                  <button
+                    className={"btn btn-success"}
+                    onClick={() => {
+                      this.setState({ topicCreateIsActive: false });
+                      this.handleCreateTopic(createTopicName);
+                    }}
+                  >
+                    {"Confirm"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {/* Topic Delete Modal */}
+        {topicDeleteIsActive && (
+          <Modal onClose={() => this.setState({ topicDeleteIsActive: false })}>
+            <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
+              <div
+                className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
+                style={{ height: "200px", width: "200px"}}
+              >
+                <h5 className={"text-danger text-center"}>{`Confirm Topic Deletion: ${deleteTopicName}`}</h5>
+                <div className={"d-flex justify-content-around mt-3 w-100"}>
+                  <button
+                    className={"btn btn-secondary"}
+                    onClick={() => this.setState({ topicDeleteIsActive: false })}
+                  >
+                    {"Cancel"}
+                  </button>
+                  <button
+                    className={"btn btn-danger"}
+                    onClick={() => {
+                      this.setState({ topicDeleteIsActive: false });
+                      this.handleDeleteTopic(deleteTopicName);
+                    }}
+                  >
+                    {"Confirm"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        )}
 
         {/* Error Modal */}
         {error && (
@@ -138,22 +233,54 @@ class HomePage extends Component {
   }
 
   componentWillUnmount() {
-    const { topicWebSocket } = this.state;
-    if(topicWebSocket) {
-      topicWebSocket.shutown();
-    }
+    this.handleShutdownWebSocket();
   }
+
+  handleCreateTopic = (topicName) => {
+    const { connectionUrl } = this.state;
+    this.setState({ topicsAreLoading: true });
+
+    Orchestration.createRequestWithBody(
+      ("POST"),
+      (`${connectionUrl}/topics`),
+      ({ topicName }),
+      (httpError) => {
+        this.setState({ error: httpError });
+        this.handleGetTopics();
+      },
+      (/* httpResponse */) => {
+        this.handleGetTopics();
+      }
+    );
+  };
+
+  handleDeleteTopic = (topicName) => {
+    const { connectionUrl } = this.state;
+    this.setState({ topicsAreLoading: true });
+
+    Orchestration.createRequestWithBody(
+      ("DELETE"),
+      (`${connectionUrl}/topics`),
+      ({ topicName }),
+      (httpError) => {
+        this.setState({ error: httpError });
+        this.handleGetTopics();
+      },
+      (/* httpResponse */) => {
+        this.handleGetTopics();
+      }
+    );
+  };
 
   handleGetTopics = () => {
     const { connectionUrl } = this.state;
-    this.setState({
-      selectedTopic: "",
-      topicsAreLoading: true
-    });
+    this.handleShutdownWebSocket();
+    this.handleResetSelectedTopic();
+    this.setState({ topicsAreLoading: true });
 
     Orchestration.createRequest(
-      "GET",
-      `${connectionUrl}/describe/topics`,
+      ("GET"),
+      (`${connectionUrl}/describe/topics`),
       (httpError) => {
         this.setState({
           error: httpError,
@@ -169,17 +296,33 @@ class HomePage extends Component {
     );
   };
 
+  handlePublishToTopic = (topicName, topicData) => {
+    const { connectionUrl } = this.state;
+    this.setState({ inputIsLoading: true });
+    Orchestration.createRequestWithBody(
+      ("POST"),
+      (`${connectionUrl}/publish`),
+      ({ topicData, topicName }),
+      (httpError) => {
+        this.setState({
+          error: httpError,
+          topicsAreLoading: false
+        });
+      },
+      (/* httpResponse */) => {
+        this.setState({ inputIsLoading: false });
+      }
+    );
+  };
+
   handleSelectTopic = (topicName) => {
-    const { connectionUrl, topicWebSocket } = this.state;
+    const { connectionUrl } = this.state;
+    this.handleShutdownWebSocket();
     this.setState({
       selectedTopic: topicName,
       selectedTopicIsLoading: true,
+      selectedTopicOutput: [],
     });
-
-    // close any exisiting websocket connection
-    if(topicWebSocket) {
-      topicWebSocket.shutdown();
-    }
 
     // request the new websocket connection
     Orchestration.createRequestWithBody(
@@ -187,7 +330,6 @@ class HomePage extends Component {
       (`${connectionUrl}/consume`),
       ({ topicName, fromBeginning: true }),
       (httpError) => {
-        console.log("Received error:", httpError);
         this.setState({
           error: httpError,
           selectedTopicIsLoading: false,
@@ -195,12 +337,12 @@ class HomePage extends Component {
         });
       },
       (/* httpResponse */) => {
-        console.log("Received response, creating websocket client.");
         const newTopicWebSocket = new WebSocketClient(
-          "ws://ec2-52-222-1-129.us-gov-west-1.compute.amazonaws.com:8081",
+          (`ws://${Config.kafkaEC2Address}:8081`),
           (topicMessage) => {
-            console.log("received: ", topicMessage);
-            this.setState((state) => ({ selectedTopicOutput: [ ...state.selectedTopicOutput, topicMessage ]}));
+            this.setState((state) => ({
+              selectedTopicOutput: [ ...state.selectedTopicOutput, topicMessage ]
+            }));
           }
         );
         this.setState({
@@ -209,6 +351,21 @@ class HomePage extends Component {
         });
       }
     );
+  };
+
+  handleResetSelectedTopic = () => {
+    this.setState({
+      selectedTopic: "",
+      selectedTopicIsLoading: false,
+      selectedTopicOutput: [],
+    });
+  };
+
+  handleShutdownWebSocket = () => {
+    const { topicWebSocket } = this.state;
+    if(topicWebSocket instanceof WebSocketClient) {
+      topicWebSocket.shutdown();
+    }
   };
 }
 export default HomePage;
