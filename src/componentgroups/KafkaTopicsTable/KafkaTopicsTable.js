@@ -6,7 +6,7 @@ import SVG from "../../components/SVG";
 
 // SVGs
 import SVG_Caret_Right from "../../svgs/SVG_Caret_Right";
-import SVG_Harddrive from "../../svgs/SVG_Harddrive";
+import SVG_Trash from "../../svgs/SVG_Trash";
 
 const KafkaTopicsTable = (props) => {
   const topics = props.topics;
@@ -21,8 +21,19 @@ const KafkaTopicsTable = (props) => {
         rows.push(
           <tr className={isSelected ? "bg-dark text-light" : ""} key={topic.topicName}>
             <th>{topic.topicName}</th>
-            <td><DiskSpaceIndicator bytes={topic.bytes} fill={isSelected ? "white" : "black"}/></td>
-            <td>
+            <td className={"pr-0"}>
+              <button
+                className={"btn btn-danger btn-sm"}
+                onClick={() => {
+                  if(props.onDeleteTopic instanceof Function) {
+                    props.onDeleteTopic(topic.topicName);
+                  }
+                }}
+              >
+                <SVG fill={"white"}>{SVG_Trash}</SVG>
+              </button>
+            </td>
+            <td className={"pr-0"}>
               <button
                 className={`btn btn-primary btn-sm ${isSelected ? "disabled" : ""}`}
                 onClick={() => {
@@ -45,7 +56,10 @@ const KafkaTopicsTable = (props) => {
     );
   } else {
     return (
-      <div className={props.className || "rounded table table-bordered"}>
+      <div
+        className={props.className || "bg-light p-1 rounded table-bordered"}
+        style={{ maxWidth: "200px"}}
+      >
         {"No Topics available, connect to a MSK Node and refresh Topics."}
       </div>
     );
@@ -53,21 +67,3 @@ const KafkaTopicsTable = (props) => {
 };
 export default KafkaTopicsTable;
 
-export const DiskSpaceIndicator = (props) => {
-  const BYTE_MULTIPLIER = 1024;
-  const DECIMAL_LIMITER = 2;
-  const formatBytes = (bytes) => {
-    const suffix = Math.floor(Math.log(bytes) / Math.log(BYTE_MULTIPLIER));
-    return "0" === String(bytes)
-      ? "0 Bytes"
-      : `${parseFloat((bytes / Math.pow(BYTE_MULTIPLIER, suffix)).toFixed(Math.max(0, DECIMAL_LIMITER)))} ` +
-        `${["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"][suffix]}`;
-  };
-
-  return (
-    <div className={"d-flex align-items-center"}>
-      <SVG fill={props.fill}>{SVG_Harddrive}</SVG>
-      <span className={"ml-1"}>{formatBytes(props.bytes)}</span>
-    </div>
-  );
-};
