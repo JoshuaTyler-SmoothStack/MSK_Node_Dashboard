@@ -338,7 +338,7 @@ class HomePage extends Component {
       },
       (/* httpResponse */) => {
         const newTopicWebSocket = new WebSocketClient(
-          (`ws://${Config.kafkaEC2Address}:8081`),
+          (`ws://${connectionUrl.replace("http://", "").replace(":8080", ":8081")}`),
           (topicMessage) => {
             this.setState((state) => ({
               selectedTopicOutput: [ ...state.selectedTopicOutput, topicMessage ]
