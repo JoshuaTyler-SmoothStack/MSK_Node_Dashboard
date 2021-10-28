@@ -280,7 +280,7 @@ class HomePage extends Component {
 
     Orchestration.createRequest(
       ("GET"),
-      (`${connectionUrl}/describe/topics`),
+      (`${connectionUrl}/topics`),
       (httpError) => {
         this.setState({
           error: httpError,

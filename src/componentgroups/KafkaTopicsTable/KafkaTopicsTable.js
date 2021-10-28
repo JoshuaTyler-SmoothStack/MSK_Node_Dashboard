@@ -12,21 +12,21 @@ const KafkaTopicsTable = (props) => {
   const topics = props.topics;
   const topicSelected = props.topicSelected || "";
 
-  if (topics && topics.length) {
+  if (topics) {
     const rows = [];
     for (const i in topics) {
       if (topics[i]) {
         const topic = topics[i];
-        const isSelected = topicSelected === topic.topicName;
+        const isSelected = topicSelected === topic;
         rows.push(
-          <tr className={isSelected ? "bg-dark text-light" : ""} key={topic.topicName}>
-            <th>{topic.topicName}</th>
+          <tr className={isSelected ? "bg-dark text-light" : ""} key={topic}>
+            <th>{topic}</th>
             <td className={"pr-0"}>
               <button
                 className={"btn btn-danger btn-sm"}
                 onClick={() => {
                   if(props.onDeleteTopic instanceof Function) {
-                    props.onDeleteTopic(topic.topicName);
+                    props.onDeleteTopic(topic);
                   }
                 }}
               >
@@ -38,7 +38,7 @@ const KafkaTopicsTable = (props) => {
                 className={`btn btn-primary btn-sm ${isSelected ? "disabled" : ""}`}
                 onClick={() => {
                   if(props.onSelectTopic instanceof Function && !isSelected) {
-                    props.onSelectTopic(topic.topicName);
+                    props.onSelectTopic(topic);
                   }
                 }}
               >
