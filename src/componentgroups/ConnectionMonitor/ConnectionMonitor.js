@@ -43,7 +43,7 @@ const ConnectionMonitor = (props) => {
       (response) => {
         setConnectionIsLoading(false);
         setConnectionInformation(response);
-        if (response.bootstrapBroker && response.zookeeperConnectionString) {
+        if (response.bootstrapBrokers && response.zookeeperConnectionString) {
           setConnectionStatus("success");
           if(props.onConnection instanceof Function) {
             props.onConnection(connectionUrl);
@@ -100,13 +100,6 @@ const ConnectionMonitor = (props) => {
               </colgroup>
               <tbody>
                 <tr>
-                  <th>{"Kafka Version:"}</th>
-                  {connectionInformation.version
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.version}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
                   <th>{"Kafka Arn:"}</th>
                   {connectionInformation.arn
                     ? <td style={TABLE_TD_STYLE}>{connectionInformation.arn}</td>
@@ -121,9 +114,9 @@ const ConnectionMonitor = (props) => {
                   }
                 </tr>
                 <tr>
-                  <th>{"Bootstrap Broker:"}</th>
-                  {connectionInformation.bootstrapBroker
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.bootstrapBroker}</td>
+                  <th>{"Bootstrap Brokers:"}</th>
+                  {connectionInformation.bootstrapBrokers
+                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.bootstrapBrokers}</td>
                     : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
                   }
                 </tr>

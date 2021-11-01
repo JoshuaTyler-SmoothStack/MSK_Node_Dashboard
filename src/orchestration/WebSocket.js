@@ -91,7 +91,7 @@ export class WebSocketClient {
 
     // Server Message
     client.onmessage = (message) => {
-      const data = JSON.parse(message.data);
+      const data = message.data;
       if(onWebSocketServerMessage instanceof Function) {
         onWebSocketServerMessage(data);
       }

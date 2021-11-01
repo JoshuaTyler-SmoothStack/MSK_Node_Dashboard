@@ -19,7 +19,7 @@ class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      connectionUrl: "",
+      connectionUrl: String(`http://${Config.kafkaEC2Address}:8080`),
       createTopicName: "",
       deleteTopicName: "",
       error: "",
@@ -111,7 +111,7 @@ class HomePage extends Component {
             </div>
 
             {/* Selected Topic Command Line Interface */}
-            <div className={"card kit-border-shadow-sm"} style={{ width: "250px" }}>
+            <div className={"card kit-border-shadow-sm"} style={{ width: "100%" }}>
 
               {/* Header */}
               <div className={"bg-white card-header pb-0"}>
