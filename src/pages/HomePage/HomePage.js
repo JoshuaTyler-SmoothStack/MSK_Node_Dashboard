@@ -64,7 +64,7 @@ class HomePage extends Component {
 
             {/* MSK ConnectionMonitor */}
             <ConnectionMonitor
-              searchSuggestions={[ `http://${Config.kafkaEC2Address}:8080` ]}
+              searchSuggestions={[`http://${Config.kafkaEC2Address}:8080`]}
               onConnection={(connectionUrl) => {
                 this.setState({ connectionUrl });
                 this.handleGetTopics();
@@ -82,9 +82,9 @@ class HomePage extends Component {
               <div className={"bg-white card-header d-flex align-items-center"}>
                 <div className={"card-title h3"}>{"Topics"}</div>
                 <button
-                  className={`btn btn-success btn-sm ml-auto ${ createTopicDisabled ? "disabled" : ""}`}
+                  className={`btn btn-success btn-sm ml-auto ${createTopicDisabled ? "disabled" : ""}`}
                   onClick={() => {
-                    if(!createTopicDisabled) {
+                    if (!createTopicDisabled) {
                       this.setState({ topicCreateIsActive: true });
                     }
                   }}
@@ -155,7 +155,7 @@ class HomePage extends Component {
             <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
               <div
                 className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
-                style={{ height: "200px", width: "200px"}}
+                style={{ height: "200px", width: "200px" }}
               >
                 <h5 className={"text-dark text-center"}>{"Topic Name:"}</h5>
                 <input
@@ -190,7 +190,7 @@ class HomePage extends Component {
             <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
               <div
                 className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
-                style={{ height: "200px", width: "200px"}}
+                style={{ height: "200px", width: "200px" }}
               >
                 <h5 className={"text-danger text-center"}>{`Confirm Topic Deletion: ${deleteTopicName}`}</h5>
                 <div className={"d-flex justify-content-around mt-3 w-100"}>
@@ -221,7 +221,7 @@ class HomePage extends Component {
             <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
               <div
                 className={"bg-white d-flex justify-content-center p-1 rounded"}
-                style={{ height: "200px", width: "200px"}}
+                style={{ height: "200px", width: "200px" }}
               >
                 <h5 className={"text-danger"}>{String(error)}</h5>
               </div>
@@ -341,7 +341,7 @@ class HomePage extends Component {
           (`ws://${connectionUrl.replace("http://", "").replace(":8080", ":8081")}`),
           (topicMessage) => {
             this.setState((state) => ({
-              selectedTopicOutput: [ ...state.selectedTopicOutput, topicMessage ]
+              selectedTopicOutput: [...state.selectedTopicOutput, topicMessage]
             }));
           }
         );
@@ -363,7 +363,7 @@ class HomePage extends Component {
 
   handleShutdownWebSocket = () => {
     const { topicWebSocket } = this.state;
-    if(topicWebSocket instanceof WebSocketClient) {
+    if (topicWebSocket instanceof WebSocketClient) {
       topicWebSocket.shutdown();
     }
   };
