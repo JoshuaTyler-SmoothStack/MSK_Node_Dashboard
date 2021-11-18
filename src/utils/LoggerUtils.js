@@ -1,11 +1,8 @@
 // Global Libraries
-import UuidUtils from "./UuidUtils.js";
+import PublishSubscribeUtils from "./PublishSubscribeUtils.js";
 
 // Constants - Global
 import { ENVIRONMENTS } from "../statemanagement/Store.js";
-
-// Constants - Local
-const ERROR_BAD_SUBSCRIBER = "Unable to bind LoggerUtils subscriber, passed instance is not a function.";
 
 class LoggerUtils {
   static debugActive = true;
@@ -100,29 +97,15 @@ class LoggerUtils {
   Publish & Subscribe
   ====================*/
   static publish(message) {
-    const subscriberKeys = Object.keys(LoggerUtils.subscribers);
-    for (const key in subscriberKeys) {
-      if (LoggerUtils.subscribers[subscriberKeys[key]] instanceof Function) {
-        LoggerUtils.subscribers[subscriberKeys[key]](message);
-      } else {
-        LoggerUtils.unsubscribe(subscriberKeys[key]);
-      }
-    }
+    PublishSubscribeUtils.publish(message, LoggerUtils.subscribers);
   }
 
   static subscribe(onLog) {
-    if (onLog instanceof Function) {
-      const key = String(`LoggerUtils-Subscriber-${UuidUtils.uuid()}`);
-      LoggerUtils.subscribers[key] = onLog;
-    } else {
-      LoggerUtils.error(ERROR_BAD_SUBSCRIBER);
-    }
+    PublishSubscribeUtils.subscribe(onLog, LoggerUtils.subscribers, "LoggerUtils");
   }
 
   static unsubscribe(key) {
-    if (LoggerUtils.subscribers.hasOwnProperty(key)) {
-      delete LoggerUtils.subscribers[key];
-    }
+    PublishSubscribeUtils.unsubscribe(key, LoggerUtils.subscribers);
   }
 }
 export default LoggerUtils;

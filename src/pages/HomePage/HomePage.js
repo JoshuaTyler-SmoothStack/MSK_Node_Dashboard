@@ -1,8 +1,5 @@
 // Libraries
-import Config from "../../resources/Config.json";
-import Orchestration from "../../orchestration/Orchestration";
 import React, { Component } from "react";
-import { WebSocketClient } from "../../orchestration/WebSocket";
 
 // Components
 import ConnectionMonitor from "../../componentgroups/ConnectionMonitor";
@@ -14,12 +11,13 @@ import SVG from "../../components/SVG";
 
 // SVGs
 import SVG_Shield_Exclamation from "../../svgs/SVG_Shield_Exclamation";
+import KafkaInterface from "../../componentgroups/KafkaInterface/KafkaInterface";
+import AwsKafka from "../../orchestration/AwsKafka";
 
 class HomePage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      connectionUrl: String(`http://${Config.kafkaEC2Address}:8080`),
       createTopicName: "",
       deleteTopicName: "",
       error: "",
@@ -31,7 +29,6 @@ class HomePage extends Component {
       topicDeleteIsActive: false,
       topics: [],
       topicsAreLoading: false,
-      topicWebSocket: null,
     };
   }
 
@@ -57,17 +54,23 @@ class HomePage extends Component {
 
         {/* Kafka Cluster Connection Interface */}
         <section className={"jumbotron text-center mt-2 px-4 py-2 kit-border-shadow"}>
+
           {/* MSK ConnectionMonitor */}
           <ConnectionMonitor
-            searchSuggestions={[`http://${Config.kafkaEC2Address}:8080`]}
+            searchSuggestions={[AwsKafka.connectionUrl]}
             onConnection={(connectionUrl) => {
               this.setState({ connectionUrl });
               this.handleGetTopics();
             }}
           />
+        </section>
 
-          {/* Kafka Topic Interface */}
+        {/* Kafka Topic Interface */}
+        <section className={"bg-dark jumbotron p-0 pb-2 overflow-hidden rounded kit-border-shadow"}>
+          <KafkaInterface topics={topics}/>
+        </section>
 
+        <section>
             {/* Topics */}
             <div className={"card flex-grow-1 mr-1 kit-border-shadow-sm"}>
 
@@ -138,8 +141,6 @@ class HomePage extends Component {
             </div>
         </section>
 
-        {/* Consumers */}
-        {/* Producers */}
 
         {/* Topic Create Modal */}
         {topicCreateIsActive && (
@@ -147,7 +148,7 @@ class HomePage extends Component {
             <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
               <div
                 className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
-                style={{ height: "200px", width: "200px" }}
+                style={{ height: "200px", width: "300px" }}
               >
                 <h5 className={"text-dark text-center"}>{"Topic Name:"}</h5>
                 <input
@@ -182,9 +183,14 @@ class HomePage extends Component {
             <div className={"d-flex align-items-center justify-content-center h-100 w-100"}>
               <div
                 className={"bg-white d-flex flex-column align-items-center justify-content-center p-1 rounded"}
-                style={{ height: "200px", width: "200px" }}
+                style={{ height: "200px", width: "300px" }}
               >
-                <h5 className={"text-danger text-center"}>{`Confirm Topic Deletion: ${deleteTopicName}`}</h5>
+                <h5 className={"text-danger text-center"}>
+                  {"Confirm Topic Deletion:"}
+                </h5>
+                <h6 className={"p-2 text-danger text-center w-100"} style={{ overflowX: "auto", overflowY: "hidden" }}>
+                  {deleteTopicName}
+                </h6>
                 <div className={"d-flex justify-content-around mt-3 w-100"}>
                   <button
                     className={"btn btn-secondary"}
@@ -225,124 +231,54 @@ class HomePage extends Component {
   }
 
   componentWillUnmount() {
-    this.handleShutdownWebSocket();
+    AwsKafka.websocketStop();
   }
 
   handleCreateTopic = (topicName) => {
-    const { connectionUrl } = this.state;
     this.setState({ topicsAreLoading: true });
-
-    Orchestration.createRequestWithBody(
-      ("POST"),
-      (`${connectionUrl}/topics`),
-      ({ topicName }),
-      (httpError) => {
-        this.setState({ error: httpError });
-        this.handleGetTopics();
-      },
-      (/* httpResponse */) => {
-        this.handleGetTopics();
-      }
-    );
+    AwsKafka.createTopic(topicName)
+    .catch((error) => this.setState({ error }))
+    .finally(() => this.handleGetTopics());
   };
 
   handleDeleteTopic = (topicName) => {
-    const { connectionUrl } = this.state;
     this.setState({ topicsAreLoading: true });
-
-    Orchestration.createRequestWithBody(
-      ("DELETE"),
-      (`${connectionUrl}/topics`),
-      ({ topicName }),
-      (httpError) => {
-        this.setState({ error: httpError });
-        this.handleGetTopics();
-      },
-      (/* httpResponse */) => {
-        this.handleGetTopics();
-      }
-    );
+    AwsKafka.deleteTopic(topicName)
+    .catch((error) => this.setState({ error }))
+    .finally(() => this.handleGetTopics());
   };
 
   handleGetTopics = () => {
-    const { connectionUrl } = this.state;
-    this.handleShutdownWebSocket();
     this.handleResetSelectedTopic();
     this.setState({ topicsAreLoading: true });
-
-    Orchestration.createRequest(
-      ("GET"),
-      (`${connectionUrl}/topics`),
-      (httpError) => {
-        this.setState({
-          error: httpError,
-          topicsAreLoading: false
-        });
-      },
-      (httpResponse) => {
-        this.setState({
-          topics: httpResponse,
-          topicsAreLoading: false
-        });
-      }
-    );
+    AwsKafka.getTopics()
+    .then((topics) => {
+      this.setState({
+        topics: topics.sort(),
+        topicsAreLoading: false
+      });
+    })
+    .catch((error) => {
+      this.setState({
+        error,
+        topicsAreLoading: false
+      });
+    });
   };
 
   handlePublishToTopic = (topicName, topicData) => {
-    const { connectionUrl } = this.state;
     this.setState({ inputIsLoading: true });
-    Orchestration.createRequestWithBody(
-      ("POST"),
-      (`${connectionUrl}/publish`),
-      ({ topicData, topicName }),
-      (httpError) => {
-        this.setState({
-          error: httpError,
-          topicsAreLoading: false
-        });
-      },
-      (/* httpResponse */) => {
-        this.setState({ inputIsLoading: false });
-      }
-    );
+    AwsKafka.publishToTopic(topicName, topicData)
+    .catch((error) => this.setState({ error }))
+    .finally(() => this.setState({ inputIsLoading: false }));
   };
 
   handleSelectTopic = (topicName) => {
-    const { connectionUrl } = this.state;
-    this.handleShutdownWebSocket();
     this.setState({
       selectedTopic: topicName,
       selectedTopicIsLoading: true,
       selectedTopicOutput: [],
     });
-
-    // request the new websocket connection
-    Orchestration.createRequestWithBody(
-      ("POST"),
-      (`${connectionUrl}/consume`),
-      ({ topicName, fromBeginning: true }),
-      (httpError) => {
-        this.setState({
-          error: httpError,
-          selectedTopicIsLoading: false,
-          topicWebSocket: null,
-        });
-      },
-      (/* httpResponse */) => {
-        const newTopicWebSocket = new WebSocketClient(
-          (`ws://${connectionUrl.replace("http://", "").replace(":8080", ":8081")}`),
-          (topicMessage) => {
-            this.setState((state) => ({
-              selectedTopicOutput: [...state.selectedTopicOutput, topicMessage]
-            }));
-          }
-        );
-        this.setState({
-          selectedTopicIsLoading: false,
-          topicWebSocket: newTopicWebSocket,
-        });
-      }
-    );
   };
 
   handleResetSelectedTopic = () => {
@@ -351,13 +287,6 @@ class HomePage extends Component {
       selectedTopicIsLoading: false,
       selectedTopicOutput: [],
     });
-  };
-
-  handleShutdownWebSocket = () => {
-    const { topicWebSocket } = this.state;
-    if (topicWebSocket instanceof WebSocketClient) {
-      topicWebSocket.shutdown();
-    }
   };
 }
 export default HomePage;
