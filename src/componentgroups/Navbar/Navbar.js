@@ -2,8 +2,7 @@
 import React from "react";
 
 // Constants (Local)
-const DEFAULT_CLASSNAME =
-  "navbar align-items-center justify-content-start px-2 py-0 kit-gradient-grey";
+const DEFAULT_CLASSNAME = "navbar align-items-center justify-content-start px-2 py-0 kit-gradient-grey";
 
 const Navbar = (props) => {
   return (

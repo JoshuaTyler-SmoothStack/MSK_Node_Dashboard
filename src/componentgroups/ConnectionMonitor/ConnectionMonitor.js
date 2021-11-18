@@ -3,7 +3,6 @@ import Orchestration from "../../orchestration/Orchestration";
 import React, { useState } from "react";
 
 // Components
-import ConnectionIndicator from "../../components/ConnectionIndicator";
 import InputText from "../InputText";
 import VerticalRule from "../../components/VerticalRule";
 import SVG from "../../components/SVG";
@@ -56,11 +55,10 @@ const ConnectionMonitor = (props) => {
   };
 
   return (
-    <div className={"bg-light d-flex align-items-center rounded m-1 p-1 w-100 kit-border-shadow"}>
+    <div className={"bg-light d-flex align-items-center p-1 rounded kit-border-shadow"}>
+
       {/* Label */}
-      <div
-        className={"bg-info p-1 rounded text-light"}
-      >
+      <div className={"bg-info p-1 rounded text-light"}>
         {"MSK Node"}
       </div>
 
@@ -81,69 +79,7 @@ const ConnectionMonitor = (props) => {
           {showConnectionInformation ? SVG_Caret_Up : SVG_Caret_Down}
         </SVG>
         {showConnectionInformation && (
-          <div
-            className={"bg-light rounded kit-border-shadow-sm"}
-            style={{
-              left: "0px",
-              overflow: "hidden",
-              position: "absolute",
-              top: "30px",
-              userSelect: "text",
-              zIndex: 1,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <table className={"table table-bordered"}>
-              <colgroup>
-                <col span={1} />
-                <col span={1} className={"bg-white"} />
-              </colgroup>
-              <tbody>
-                <tr>
-                  <th>{"Kafka Arn:"}</th>
-                  {connectionInformation.arn
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.arn}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
-                  <th>{"AWS Region:"}</th>
-                  {connectionInformation.region
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.region}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
-                  <th>{"Bootstrap Brokers:"}</th>
-                  {connectionInformation.bootstrapBrokers
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.bootstrapBrokers}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
-                  <th>{"Zookeeper Connection:"}</th>
-                  {connectionInformation.zookeeperConnectionString
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.zookeeperConnectionString}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
-                  <th>{"Partition Count:"}</th>
-                  {connectionInformation.partitionCount
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.partitionCount}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-                <tr>
-                  <th>{"Replication Factor:"}</th>
-                  {connectionInformation.replicationFactor
-                    ? <td style={TABLE_TD_STYLE}>{connectionInformation.replicationFactor}</td>
-                    : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
-                  }
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <ConnectionInformation connectionInformation={connectionInformation}/>
         )}
       </button>
 
@@ -156,6 +92,8 @@ const ConnectionMonitor = (props) => {
         searchSuggestions={searchSuggestions}
         onChange={(value) => setConnectionUrl(value)}
       />
+
+      {/* Connect Button */}
       <button
         className={"btn btn-success btn-sm ml-1"}
         onClick={() => pingMskConnection()}
@@ -166,3 +104,101 @@ const ConnectionMonitor = (props) => {
   );
 };
 export default ConnectionMonitor;
+
+export const ConnectionIndicator = (props) => {
+  // @props: indicatorSize - String
+  // @props: isLoading - Boolean
+  // @props: status - String (danger, success, warn)
+
+  const indicatorSize = props.indicatorSize || "25px";
+  const isLoading = props.isLoading || false;
+  const status = props.status || "success";
+
+  return (
+    <div
+      className={props.className}
+      style={props.style}
+    >
+      {/* Indicator */}
+      {isLoading
+        ? (<div
+            className={"bg-light spinner-border text-info kit-border-shadow-sm"}
+            style={{ height: indicatorSize, width: indicatorSize }}
+          />)
+        : (<div
+            className={`bg-${status} rounded-circle kit-border-shadow-sm`}
+            style={{ height: indicatorSize, width: indicatorSize }}
+          />)
+      }
+    </div>
+  );
+};
+
+export const ConnectionInformation = (props) => {
+  // @props: connectionInformation - Object
+  const connectionInformation = props.connectionInformation || {};
+
+  return (
+    <table
+      className={"table table-bordered kit-border-shadow-sm"}
+      style={{
+        left: "0px",
+        overflow: "hidden",
+        position: "absolute",
+        top: "30px",
+        userSelect: "text",
+        zIndex: 1,
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <colgroup>
+        <col span={1} className={"bg-light"}/>
+        <col span={1} className={"bg-white"} />
+      </colgroup>
+      <tbody>
+        <tr>
+          <th>{"Kafka Arn:"}</th>
+          {connectionInformation.arn
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.arn}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+        <tr>
+          <th>{"AWS Region:"}</th>
+          {connectionInformation.region
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.region}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+        <tr>
+          <th>{"Bootstrap Brokers:"}</th>
+          {connectionInformation.bootstrapBrokers
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.bootstrapBrokers}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+        <tr>
+          <th>{"Zookeeper Connection:"}</th>
+          {connectionInformation.zookeeperConnectionString
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.zookeeperConnectionString}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+        <tr>
+          <th>{"Partition Count:"}</th>
+          {connectionInformation.partitionCount
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.partitionCount}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+        <tr>
+          <th>{"Replication Factor:"}</th>
+          {connectionInformation.replicationFactor
+            ? <td style={TABLE_TD_STYLE}>{connectionInformation.replicationFactor}</td>
+            : <td className={TABLE_TD_ERROR_CLASSNAME} style={TABLE_TD_STYLE}>{"undefined"}</td>
+          }
+        </tr>
+      </tbody>
+    </table>
+  );
+};

@@ -55,25 +55,18 @@ class HomePage extends Component {
     return (
       <div className={this.props.className || ""} style={this.props.style}>
 
-        {/* Icon gallery of technologies */}
-        <section
-          className={"jumbotron text-center mt-2 px-4 py-2 kit-border-shadow"}
-        >
-          {/* Kafka Cluster Connection Interface */}
-          <div className={"row"}>
-
-            {/* MSK ConnectionMonitor */}
-            <ConnectionMonitor
-              searchSuggestions={[`http://${Config.kafkaEC2Address}:8080`]}
-              onConnection={(connectionUrl) => {
-                this.setState({ connectionUrl });
-                this.handleGetTopics();
-              }}
-            />
-          </div>
+        {/* Kafka Cluster Connection Interface */}
+        <section className={"jumbotron text-center mt-2 px-4 py-2 kit-border-shadow"}>
+          {/* MSK ConnectionMonitor */}
+          <ConnectionMonitor
+            searchSuggestions={[`http://${Config.kafkaEC2Address}:8080`]}
+            onConnection={(connectionUrl) => {
+              this.setState({ connectionUrl });
+              this.handleGetTopics();
+            }}
+          />
 
           {/* Kafka Topic Interface */}
-          <div className={"justify-content-around row"}>
 
             {/* Topics */}
             <div className={"card flex-grow-1 mr-1 kit-border-shadow-sm"}>
@@ -143,7 +136,6 @@ class HomePage extends Component {
                 />
               </div>
             </div>
-          </div>
         </section>
 
         {/* Consumers */}
