@@ -1,5 +1,6 @@
 // Libraries
-import Orchestration from "../../orchestration/Orchestration";
+import AwsKafka from "../../orchestration/AwsKafka";
+import Config from "../../resources/Config.json";
 import React, { useState } from "react";
 
 // Components
@@ -21,37 +22,24 @@ const TABLE_TD_STYLE = {
 };
 
 const ConnectionMonitor = (props) => {
-  const searchSuggestions = props.searchSuggestions || [];
-
-  const [connectionInformation, setConnectionInformation] = useState({});
+  const searchSuggestions = [ Config.kafkaEC2Address, AwsKafka.connectionUrl ];
   const [connectionIsLoading, setConnectionIsLoading] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState("danger");
-  const [connectionUrl, setConnectionUrl] = useState("");
+  const [error, setError] = useState("");
   const [showConnectionInformation, setShowConnectionInformation] = useState(false);
 
-  // ping MSK Connection
-  const pingMskConnection = () => {
-    setConnectionIsLoading(true);
-    Orchestration.createRequest(
-      "GET",
-      `${connectionUrl}/kafka`,
-      (/*error*/) => {
-        setConnectionIsLoading(false);
-        setConnectionStatus("danger");
-      },
-      (response) => {
-        setConnectionIsLoading(false);
-        setConnectionInformation(response);
-        if (response.bootstrapBrokers && response.zookeeperConnectionString) {
-          setConnectionStatus("success");
-          if(props.onConnection instanceof Function) {
-            props.onConnection(connectionUrl);
-          }
-        } else {
-          setConnectionStatus("warning");
-        }
-      }
-    );
+  // initialize MSK Connection
+  const initializeMskConnection = () => {
+    AwsKafka.initialize()
+    .then(() => {
+      setError("");
+      setConnectionStatus("success");
+    })
+    .catch((error) => {
+      setError(error);
+      setConnectionStatus("danger");
+    })
+    .finally(() => setConnectionIsLoading(false));
   };
 
   return (
@@ -59,7 +47,7 @@ const ConnectionMonitor = (props) => {
 
       {/* Label */}
       <div className={"bg-info p-1 rounded text-light"}>
-        {"MSK Node"}
+        {"AWS MSK Node"}
       </div>
 
       {/* Indicator */}
@@ -75,12 +63,8 @@ const ConnectionMonitor = (props) => {
         style={{ position: "relative" }}
         onClick={() => setShowConnectionInformation(!showConnectionInformation)}
       >
-        <SVG fill={"white"}>
-          {showConnectionInformation ? SVG_Caret_Up : SVG_Caret_Down}
-        </SVG>
-        {showConnectionInformation && (
-          <ConnectionInformation connectionInformation={connectionInformation}/>
-        )}
+        <SVG fill={"white"}>{showConnectionInformation ? SVG_Caret_Up : SVG_Caret_Down}</SVG>
+        {showConnectionInformation && <ConnectionInformation/>}
       </button>
 
       {/* Vertical Divider */}
@@ -90,13 +74,13 @@ const ConnectionMonitor = (props) => {
       <InputText
         placeholder={"Connection Address"}
         searchSuggestions={searchSuggestions}
-        onChange={(value) => setConnectionUrl(value)}
+        onChange={(value) => AwsKafka.connectionUrl(value)}
       />
 
       {/* Connect Button */}
       <button
         className={"btn btn-success btn-sm ml-1"}
-        onClick={() => pingMskConnection()}
+        onClick={() => initializeMskConnection()}
       >
         {"Connect"}
       </button>
@@ -147,7 +131,7 @@ export const ConnectionInformation = (props) => {
         position: "absolute",
         top: "30px",
         userSelect: "text",
-        zIndex: 1,
+        zIndex: 2,
       }}
       onClick={(e) => e.stopPropagation()}
     >

@@ -7,20 +7,20 @@ import Validations from "./Validations.js";
 const STATUS_CONNECTED = "CONNECTED";
 const STATUS_NOT_CONNECTED = "NOT_CONNECTED";
 
-class Producer extends Model {
+class Consumer extends Model {
   constructor(props) {
     super();
     this.state = {
       id: UuidUtils.uuid(),
-      isProducing: false,
+      isConsuming: false,
       lastMessageTimestamp: Date.now(),
-      name: "UnnamedProducer",
+      name: "UnnamedConsumer",
       status: STATUS_NOT_CONNECTED,
       topics: []
     }
 
     if(props) {
-      this.setIsProducing(props.isProducing);
+      this.setIsConsuming(props.isConsuming);
       this.setLastMessageTimeStamp(props.lastMessageTimestamp);
       this.setName(props.name);
       this.setStatus(props.status);
@@ -30,17 +30,17 @@ class Producer extends Model {
 
   // getters
   getId() { return String(this.state.id); }
-  getIsProducing() { return Boolean(this.state.isProducing); }
+  getIsConsuming() { return Boolean(this.state.isConsuming); }
   getLastMessageTimestamp() { return Number(this.state.lastMessageTimestamp); }
   getName() { return String(this.state.name); }
   getStatus() { return String(this.state.status); }
   getTopics() {return [ ...this.state.topics ]; }
 
   // setters
-  setIsProducing(boolean, suppressOnChange) {
-    this.state.isProducing = Boolean(boolean);
+  setIsConsuming(boolean, suppressOnChange) {
+    this.state.isConsuming = Boolean(boolean);
     if(!suppressOnChange) this.onChange();
-    return this.getIsProducing();
+    return this.getIsConsuming();
   }
 
   setLastMessageTimeStamp(lastMessageTimestamp, suppressOnChange) {
@@ -107,4 +107,4 @@ class Producer extends Model {
     return this.getTopics();
   }
 }
-export default Producer;
+export default Consumer;

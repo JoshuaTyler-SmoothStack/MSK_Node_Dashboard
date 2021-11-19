@@ -2,7 +2,7 @@
 import React, { Component } from "react";
 
 // Components
-import ConnectionMonitor from "../../componentgroups/ConnectionMonitor";
+import ConnectionInterface from "../../componentgroups/ConnectionMonitor";
 import KafkaTopicInputOutput from "../../componentgroups/KafkaTopicInputOutput";
 import KafkaTopicsTable from "../../componentgroups/KafkaTopicsTable";
 import Modal from "../../componentgroups/Modal";
@@ -54,20 +54,12 @@ class HomePage extends Component {
 
         {/* Kafka Cluster Connection Interface */}
         <section className={"jumbotron text-center mt-2 px-4 py-2 kit-border-shadow"}>
-
-          {/* MSK ConnectionMonitor */}
-          <ConnectionMonitor
-            searchSuggestions={[AwsKafka.connectionUrl]}
-            onConnection={(connectionUrl) => {
-              this.setState({ connectionUrl });
-              this.handleGetTopics();
-            }}
-          />
+          <ConnectionInterface/>
         </section>
 
         {/* Kafka Topic Interface */}
         <section className={"bg-dark jumbotron p-0 pb-2 overflow-hidden rounded kit-border-shadow"}>
-          <KafkaInterface topics={topics}/>
+          <KafkaInterface/>
         </section>
 
         <section>
@@ -98,7 +90,7 @@ class HomePage extends Component {
               {/* Topics Table */}
               <div className={"card-body d-flex align-items-center justify-content-center p-1"}>
                 <KafkaTopicsTable
-                  topics={topics}
+                  topics={topics.map((topic) => topic.getName())}
                   topicSelected={selectedTopic}
                   onDeleteTopic={(topicName) => this.setState({ deleteTopicName: topicName, topicDeleteIsActive: true })}
                   onSelectTopic={(topicName) => this.handleSelectTopic(topicName)}
@@ -254,7 +246,7 @@ class HomePage extends Component {
     AwsKafka.getTopics()
     .then((topics) => {
       this.setState({
-        topics: topics.sort(),
+        topics: topics.sort((topic) => topic.getName()),
         topicsAreLoading: false
       });
     })

@@ -270,3 +270,13 @@ Scrolling
 .kit-scroll-smooth {
   scroll-behavior: smooth;
 }
+
+/*====================
+zIndex
+====================*/
+.kit-z-0 { z-index: 0; }
+.kit-z-1 { z-index: 1; }
+.kit-z-2 { z-index: 2; }
+.kit-z-3 { z-index: 3; }
+.kit-z-4 { z-index: 4; }
+.kit-z-5 { z-index: 5; }

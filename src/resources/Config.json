@@ -1,5 +1,5 @@
 {
-  "kafkaEC2Address": "ec2-3-32-32-244.us-gov-west-1.compute.amazonaws.com",
+  "kafkaEC2Address": "ec2-52-61-142-66.us-gov-west-1.compute.amazonaws.com",
   "name": "MSK_Node_Dashboard",
   "version": "1.0.0"
 }
